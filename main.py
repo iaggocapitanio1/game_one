@@ -11,6 +11,7 @@ __copyright__ = "Copyright (C) 2020 Iaggo Capitanio"
 __license__ = "Public Domain"
 __version__ = "1.1.1"
 
+import typing as ty
 import pygame
 import os
 import random
@@ -19,11 +20,22 @@ from playerShip import Player
 
 pygame.init()
 pygame.font.init()
-WIDTH, HEIGHT = 550, 550
+WIDTH, HEIGHT = 750, 750
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("StarWars")
 # Load images
 file_resources = "assets"
+
+
+def collide(obj1, obj2) -> ty.Union[None, tuple]:
+    """
+    :param obj1: pygame object with a mask that covers its borders.
+    :param obj2:  pygame object with a mask that covers its borders.
+    """
+    offset_x = obj1.x - obj2.x
+    offset_y = obj1.y - obj2.y
+    return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) is not None
+
 
 try:
     RED_SPACE_SHIP = pygame.image.load(os.path.join(file_resources, 'pixel_ship_red_small.png'))
@@ -51,7 +63,7 @@ def main() -> None:
     :return None
     """
     # a factor related to the normal probability of the enemy shooting
-    prob = 1
+    prob = 4
     # the laser velocity
     laser_velocity = 5
     # defines if the player lost the game
@@ -168,7 +180,7 @@ def main() -> None:
         if keys[pygame.K_w] and (player.y - player_vel) > 0:
             player.y -= player_vel
         # down
-        if keys[pygame.K_s] and (player.y + player_vel + player.get_height()) < WIN.get_height():
+        if keys[pygame.K_s] and (player.y + player_vel + player.get_height() + 20) < WIN.get_height():
             player.y += player_vel
         # shoot
         if keys[pygame.K_SPACE]:
@@ -181,8 +193,11 @@ def main() -> None:
             enemy.move(enemy_vel)
             enemy.move_lasers(velocity=laser_velocity, obj=player, height=WIN.get_height())
 
-            if random.randrange(0, prob*FPS) == 1:
+            if random.randrange(0, prob * FPS) == 1:
                 enemy.shoot()
+            if collide(enemy, player):
+                player.health -= 10
+                enemies.remove(enemy)
 
             if enemy.y + enemy.get_height() > WIN.get_height():
                 lives -= 1
@@ -191,5 +206,25 @@ def main() -> None:
         player.move_lasers(-laser_velocity, enemies, height=WIN.get_height())
 
 
+def main_menu():
+    """
+    Main menu if the player loses.
+    """
+    title_font = pygame.font.SysFont("comicsans", 70)
+    run = True
+    while run:
+        WIN.blit(BG, (0, 0))
+        title_label = title_font.render("Press the mouse to begin....", 1, (255, 255, 255))
+        x_pos = int(WIN.get_width()/2 - title_label.get_width()/2)
+        y_pos = int(WIN.get_height()/2)
+        WIN.blit(title_label, (x_pos, y_pos))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                main()
+
+
 if __name__ == "__main__":
-    main()
+    main_menu()
