@@ -33,10 +33,10 @@ try:
     # player player
     YELLOW_SPACE_SHIP = pygame.image.load(os.path.join(file_resources, 'pixel_ship_yellow.png'))
     # Lasers
-    RED_LASERS = pygame.image.load(os.path.join(file_resources, 'pixel_laser_red.png'))
-    GREEN_LASERS = pygame.image.load(os.path.join(file_resources, 'pixel_laser_green.png'))
-    BLUE_LASERS = pygame.image.load(os.path.join(file_resources, 'pixel_laser_blue.png'))
-    YELLOW_LASERS = pygame.image.load(os.path.join(file_resources, 'pixel_laser_yellow.png'))
+    RED_LASER = pygame.image.load(os.path.join(file_resources, 'pixel_laser_red.png'))
+    GREEN_LASER = pygame.image.load(os.path.join(file_resources, 'pixel_laser_green.png'))
+    BLUE_LASER = pygame.image.load(os.path.join(file_resources, 'pixel_laser_blue.png'))
+    YELLOW_LASER = pygame.image.load(os.path.join(file_resources, 'pixel_laser_yellow.png'))
     # Background
     BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIN.get_height(),
                                                                                                     WIN.get_width()))
@@ -51,13 +51,27 @@ def main() -> None:
 
     :return None
     """
+    # while run is true the application will keep running.
     run = True
+    # this variable defines the number of frames per second that will be used inside the clock tick.
     FPS = 60
+    # the start level.
     level = 1
+    # the number of lives at the start.
     lives = 5
+    # instance of the clock
     clock = pygame.time.Clock()
+    # main parent font.
     main_font = pygame.font.SysFont("comicsans", 50)
+    # the velocity of the ship
     player_vel = 5
+    # the set of enemies.
+    enemies = []
+    # the starting amount of enemies per wave. 
+    wave_length = 5
+    # the enemy velocity
+    enemy_vel = 1
+    # Creation of the player object.
     player = Player(x=200, y=200)
 
     def redraw_window() -> None:
@@ -73,12 +87,20 @@ def main() -> None:
 
         WIN.blit(lives_label, (10, 10))
         WIN.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
-        player.draw(WIN)
-        pygame.display.update()
+        for enemy in enemies:
+            enemy.draw(WIN)
 
+        player.draw(WIN)
+
+
+        pygame.display.update()
     while run:
         clock.tick(FPS)
-        redraw_window()
+
+        if len(enemies) == 0:
+            level += 1
+            wave_length += 5
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -95,6 +117,9 @@ def main() -> None:
         # down
         if keys[pygame.K_s] and (player.y + player_vel + player.get_height()) < WIN.get_height():
             player.y += player_vel
+        redraw_window()
+
+
 
 
 # An Abstract Class
@@ -137,6 +162,29 @@ class Ship:
         pass
 
 
+class Enemy(Ship):
+    """
+    This class defines the enemy ships.
+    """
+    COLOR_MAP = {
+        "red": (RED_SPACE_SHIP, RED_LASER),
+        "green": (GREEN_SPACE_SHIP, GREEN_LASER),
+        "blue": (BLUE_SPACE_SHIP, BLUE_LASER)
+
+    }
+
+    def __init__(self, x, y, color, health=100):
+        super(Enemy, self).__init__(x, y, health=health)
+        self.ship_img, self.laser_img = self.COLOR_MAP[color]
+
+    def move(self, value: ty.Union[float, int]) -> None:
+        """
+
+        :param value: an float value to defines the velocity
+        """
+        self.y += value
+
+
 class Player(Ship):
     """
         Inherits the Ship class.
@@ -145,7 +193,7 @@ class Player(Ship):
     def __init__(self, x, y, health=100):
         super(Player, self).__init__(x, y, health)
         self.ship_img = YELLOW_SPACE_SHIP
-        self.laser_img = YELLOW_LASERS
+        self.laser_img = YELLOW_LASER
         self.mask = pygame.mask.from_surface(self.ship_img)
         self.max_health = health
 
