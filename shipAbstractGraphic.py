@@ -44,6 +44,12 @@ class Ship:
         """
         pass
 
+    def move_lasers(self, velocity, obj, height):
+        """
+        Move the lasers
+        """
+        pass
+
     def shoot(self) -> None:
         """
         The shoot of the ship.

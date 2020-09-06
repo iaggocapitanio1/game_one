@@ -43,6 +43,21 @@ class Enemy(Ship):
     def __init__(self, x, y, color, health=100):
         super(Enemy, self).__init__(x, y, health=health)
         self.ship_img, self.laser_img = self.COLOR_MAP[color]
+        self.mask = pygame.mask.from_surface(self.ship_img)
+
+    def move_lasers(self, velocity, obj, height):
+        """
+        Move the lasers
+        """
+        self.cool_down()
+        for laser in self.lasers:
+            laser.move(velocity)
+            # if laser id off the screen, that it will be deleted from the laser list
+            if laser.off_screen(height):
+                self.lasers.remove(laser)
+            elif laser.collision(obj):
+                obj.health -= 10
+                self.lasers.remove(laser)
 
     def move(self, value: ty.Union[float, int]) -> None:
         """

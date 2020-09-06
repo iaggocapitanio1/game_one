@@ -33,7 +33,7 @@ class Player(Ship):
     """
         Inherits the Ship class.
     """
-    COOL_DOWN= 30 # constant class variable.
+    COOL_DOWN = 15  # constant class variable.
 
     def __init__(self, x, y, health=100):
         super(Player, self).__init__(x, y, health)
@@ -76,24 +76,27 @@ class Player(Ship):
             # if laser id off the screen, that it will be deleted from the laser list
             if laser.off_screen(height):
                 self.lasers.remove(laser)
-            elif laser.collision(objects):
-
+            else:
+                for obj in objects:
+                    if laser.collision(obj):
+                        objects.remove(obj)
+                        self.lasers.remove(laser)
 
     def shoot(self):
         """
         create a laser.
         """
         if self.cool_down_counter == 0:
-            laser = Laser(x=self.x, y=self.x, img=self.laser_img)
+            laser = Laser(x=self.x, y=self.y, img=self.laser_img)
             self.lasers.append(laser)
             self.cool_down_counter = 1
 
     def cool_down(self):
         """
-        Handle the cool down counter.
+        Handle the cool down counter. This will make th laser wait until another laser
+        can be released.
         """
         if self.cool_down_counter >= self.COOL_DOWN:
             self.cool_down_counter = 0
-        elif self.cool_down_counter >0:
+        elif self.cool_down_counter > 0:
             self.cool_down_counter += 1
-

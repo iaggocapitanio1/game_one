@@ -50,7 +50,8 @@ def main() -> None:
 
     :return None
     """
-
+    # the laser velocity
+    laser_velocity = 5
     # defines if the player lost the game
     lost = False
     # while run is true the application will keep running.
@@ -58,7 +59,7 @@ def main() -> None:
     # this variable defines the number of frames per second that will be used inside the clock tick.
     FPS = 60
     # the start level.
-    level = 1
+    level = 0
     # the number of lives at the start.
     lives = 5
     # instance of the clock
@@ -69,12 +70,12 @@ def main() -> None:
     lost_font = pygame.font.SysFont("comicsans", 60)
     # the velocity of the ship
     player_vel = 5
-    # the set of enemies.
+    # the set of enemies list at start.
     enemies = []
     # the starting amount of enemies per wave.
     wave_length = 5
     # the enemy velocity
-    enemy_vel = 5
+    enemy_vel = 2
     # Creation of the player object.
     player = Player(x=200, y=200)
 
@@ -83,26 +84,46 @@ def main() -> None:
         The main functionality of this method is to provides an update to the parent object. Here will be defined the
         match's scoreboard on the top of the screen also.
         """
+        # BASIC SCREEN LAYOUT:
+        #       # background image
+        #   # scoreboard
+        #   # lives label
+        #   # level label
+        ################################################################################################################
         # set the background image
         WIN.blit(BG, (0, 0))
         # draw text
-        # noinspection PyCompatibility
-        lives_label = main_font.render(f"Lives: {lives}", 1, (255, 255, 255))
-        # noinspection PyCompatibility
-        level_label = main_font.render(f"Level: {level}", 1, (255, 255, 255))
+        try:
+            # noinspection PyCompatibility
+            lives_label = main_font.render(f"Lives: {lives}", 1, (255, 255, 255))
+            # noinspection PyCompatibility
+            level_label = main_font.render(f"Level: {level}", 1, (255, 255, 255))
+        except SyntaxError:
+            lives_label = main_font.render("Lives: {}".format(lives), 1, (255, 255, 255))
+            # noinspection PyCompatibility
+            level_label = main_font.render("Level:{} ".format(level), 1, (255, 255, 255))
 
         WIN.blit(lives_label, (10, 10))
         WIN.blit(level_label, (WIDTH - level_label.get_width() - 10, 10))
 
         # get the enemies from the array of images
+        ################################################################################################################
         for enemy in enemies:
             enemy.draw(WIN)
+
         # draw the player ship
+        ################################################################################################################
         player.draw(WIN)
+        ################################################################################################################
+
+        # if the player lost, this message will pop up.
+        ################################################################################################################
         if lost:
             lost_label = lost_font.render("You Lost!", 1, (255, 255, 255))
-            WIN.blit(lost_label, (WIN.get_width() / 2 - lost_label.get_width() / 2, 350))
-
+            x_pos = WIN.get_width() / 2 - lost_label.get_width() / 2
+            WIN.blit(lost_label, (int(x_pos), 350))
+        # update the game
+        ################################################################################################################
         pygame.display.update()
 
     # lost count will be used to specifies the interim before the game restarts.
@@ -110,6 +131,7 @@ def main() -> None:
     lost_count = 0
     while run:
         clock.tick(FPS)
+        redraw_window()
         if lives <= 0 or player.health <= 0:
             lost = True
             # this will defines
@@ -151,13 +173,18 @@ def main() -> None:
             player.shoot()
 
         ################################################################################################################
+        # This part of the code defines the maximum range of the enemies ships, if they pass though the y value:
+        # actual y enemy position plus the window height, the enemy ship will be removed from the enemies list.
         for enemy in enemies[:]:
             enemy.move(enemy_vel)
+            enemy.move_lasers(velocity=laser_velocity, obj=player, height=WIN.get_height())
             if enemy.y + enemy.get_height() > WIN.get_height():
                 lives -= 1
                 enemies.remove(enemy)
 
-        redraw_window()
+        player.move_lasers(-laser_velocity, enemies, height=WIN.get_height())
+
+
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ __license__ = "Public Domain"
 
 import pygame
 import typing as ty
+from shipAbstractGraphic import Ship
 
 
 class Laser:
@@ -22,7 +23,7 @@ class Laser:
         self.mask = pygame.mask.from_surface(self.img)
 
     @staticmethod
-    def collide(obj1: pygame.image, obj2: pygame.image) -> ty.Union[None, tuple]:
+    def collide(obj1, obj2) -> ty.Union[None, tuple]:
         """
         :param obj1: pygame object with a mask that covers its borders.
         :param obj2:  pygame object with a mask that covers its borders.
@@ -51,7 +52,7 @@ class Laser:
         :return return an boolean that tells if the laser is in or off.
 
         """
-        return height >= self.y >= 0
+        return not(height >= self.y >= 0)
 
     def collision(self, obj: pygame.image) -> ty.Union[None, tuple]:
         """
