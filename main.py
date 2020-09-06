@@ -168,7 +168,7 @@ def main() -> None:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
         keys = pygame.key.get_pressed()
         # left
         if keys[pygame.K_a] and (player.x - player_vel) > 0:
@@ -224,6 +224,7 @@ def main_menu():
                 run = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 main()
+    pygame.quit()
 
 
 if __name__ == "__main__":
