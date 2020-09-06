@@ -51,6 +51,8 @@ def main() -> None:
 
     :return None
     """
+    # defines if the player lost the game
+    lost = False
     # while run is true the application will keep running.
     run = True
     # this variable defines the number of frames per second that will be used inside the clock tick.
@@ -63,11 +65,13 @@ def main() -> None:
     clock = pygame.time.Clock()
     # main parent font.
     main_font = pygame.font.SysFont("comicsans", 50)
+    # lost message font.
+    lost_font = pygame.font.SysFont("comicsans", 60)
     # the velocity of the ship
     player_vel = 5
     # the set of enemies.
     enemies = []
-    # the starting amount of enemies per wave. 
+    # the starting amount of enemies per wave.
     wave_length = 5
     # the enemy velocity
     enemy_vel = 1
@@ -96,10 +100,15 @@ def main() -> None:
         pygame.display.update()
     while run:
         clock.tick(FPS)
-
+        if lives <= 0 or player.health <= 0:
+            lost = True
         if len(enemies) == 0:
             level += 1
             wave_length += 5
+            for i in range(wave_length):
+                enemy = Enemy(random.randrange(100, WIN.get_width()-100), random.randrange(-1500, -100),
+                              random.choice(["red", "blue", "green"]))
+                enemies.append(enemy)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -117,6 +126,13 @@ def main() -> None:
         # down
         if keys[pygame.K_s] and (player.y + player_vel + player.get_height()) < WIN.get_height():
             player.y += player_vel
+
+        for enemy in enemies[:]:
+            enemy.move(enemy_vel)
+            if enemy.y + enemy.get_height() > WIN.get_height():
+                lives -= 1
+                enemies.remove(enemy)
+
         redraw_window()
 
 
@@ -183,6 +199,28 @@ class Enemy(Ship):
         :param value: an float value to defines the velocity
         """
         self.y += value
+
+    def get_height(self) -> float:
+        """
+        Overload the parent method: get the ship's height.
+        :return:
+        """
+        return self.ship_img.get_height()
+
+    def get_width(self):
+        """
+        Overload the parent method: get the ship's width.
+        :return:
+        """
+        return self.ship_img.get_width()
+
+    def draw(self, parent):
+        """
+        Overload: parent method: draw.
+        :param parent: Parent is a pygame object, it means that it will be draw as a surface on the
+         pygame objet (screen).
+        """
+        parent.blit(self.ship_img, (self.x, self.y))
 
 
 class Player(Ship):
