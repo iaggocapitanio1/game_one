@@ -1,9 +1,22 @@
+"""
+@Description:
+A funny game. To play it, you must use the following keyboards:
+W: to go up.
+A: to fo left.
+S: to go down.
+D: to go right.
+"""
+__author__ = "Iaggo Capitanio"
+__copyright__ = "Copyright (C) 2020 Iaggo Capitanio"
+__license__ = "Public Domain"
+__version__ = "1.0.0"
+
 import pygame
 import os
 import time
 import random
 import sys
-
+import typing as ty
 pygame.init()
 pygame.font.init()
 WIDTH, HEIGHT = 550, 550
@@ -31,7 +44,12 @@ except pygame.error:
           str(os.path.join(__file__, file_resources)))
 
 
-def main():
+def main() -> None:
+    """
+    The main feature of this function is to run the game code, here is where all the game functionality works!
+
+    :return None
+    """
     run = True
     FPS = 60
     level = 1
@@ -41,7 +59,11 @@ def main():
     player_vel = 5
     player = Player(x=200, y=200)
 
-    def redraw_window():
+    def redraw_window() -> None:
+        """
+        The main functionality of this method is to provides an update to the parent object. Here will be defines the
+        match's scoreboard on the top of the screen also.
+        """
         WIN.blit(BG, (0, 0))
 
         # draw text
@@ -78,6 +100,9 @@ def main():
 # An Abstract Class
 
 class Ship:
+    """
+    This is an abstract class, it defines the main features of the object: ship
+    """
     def __init__(self, x, y, health=100):
         self.x = x
         self.y = y
@@ -88,6 +113,12 @@ class Ship:
         self.cool_down_counter = 0
         self.width = 50
         self.height = 50
+
+    # width getter
+    def get_width(self):
+        pass
+
+
 
     def draw(self, parent):
         parent.blit(self.ship_img, (self.x, self.y))
