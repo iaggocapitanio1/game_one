@@ -62,7 +62,7 @@ def main() -> None:
 
     def redraw_window() -> None:
         """
-        The main functionality of this method is to provides an update to the parent object. Here will be defines the
+        The main functionality of this method is to provides an update to the parent object. Here will be defined the
         match's scoreboard on the top of the screen also.
         """
         WIN.blit(BG, (0, 0))
@@ -114,27 +114,27 @@ class Ship:
         self.cool_down_counter = 0
 
     # width getter
-    def get_width(self):
+    def get_width(self) -> float:
         """
 
         :return: the width of the ship image.
         """
-        return self.ship_img.get_width()
+        pass
 
-    def get_height(self):
+    def get_height(self) -> float:
         """
 
         :return: the height of the ship image.
         """
-        return self.ship_img.get_height()
+        pass
 
-    def draw(self, parent):
+    def draw(self, parent) -> None:
         """
 
         :param parent: Parent is a pygame object, it means that it will be draw as a surface on the
          pygame objet (screen).
         """
-        parent.blit(self.ship_img, (self.x, self.y))
+        pass
 
 
 class Player(Ship):
@@ -148,6 +148,28 @@ class Player(Ship):
         self.laser_img = YELLOW_LASERS
         self.mask = pygame.mask.from_surface(self.ship_img)
         self.max_health = health
+
+    def get_height(self) -> float:
+        """
+        Overload the parent method: get the ship's height.
+        :return:
+        """
+        return self.ship_img.get_height()
+
+    def get_width(self):
+        """
+        Overload the parent method: get the ship's width.
+        :return:
+        """
+        return self.ship_img.get_width()
+
+    def draw(self, parent):
+        """
+        Overload: parent method: draw.
+        :param parent: Parent is a pygame object, it means that it will be draw as a surface on the
+         pygame objet (screen).
+        """
+        parent.blit(self.ship_img, (self.x, self.y))
 
 
 if __name__ == "__main__":
