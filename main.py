@@ -9,7 +9,7 @@ D: to go right.
 __author__ = "Iaggo Capitanio"
 __copyright__ = "Copyright (C) 2020 Iaggo Capitanio"
 __license__ = "Public Domain"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 import pygame
 import os
@@ -17,6 +17,7 @@ import time
 import random
 import sys
 import typing as ty
+
 pygame.init()
 pygame.font.init()
 WIDTH, HEIGHT = 550, 550
@@ -86,23 +87,23 @@ def main() -> None:
         if keys[pygame.K_a] and (player.x - player_vel) > 0:
             player.x -= player_vel
         # right
-        if keys[pygame.K_d] and (player.x + player_vel + player.width) < WIN.get_width():
+        if keys[pygame.K_d] and (player.x + player_vel + player.get_width()) < WIN.get_width():
             player.x += player_vel
         # up
         if keys[pygame.K_w] and (player.y - player_vel) > 0:
             player.y -= player_vel
         # down
-        if keys[pygame.K_s] and (player.y + player_vel + player.height) < WIN.get_height():
+        if keys[pygame.K_s] and (player.y + player_vel + player.get_height()) < WIN.get_height():
             player.y += player_vel
-
 
 
 # An Abstract Class
 
 class Ship:
     """
-    This is an abstract class, it defines the main features of the object: ship
+    This is an abstract class, it defines the main features of the object: ship.
     """
+
     def __init__(self, x, y, health=100):
         self.x = x
         self.y = y
@@ -111,20 +112,36 @@ class Ship:
         self.laser_img = None
         self.lasers = list()
         self.cool_down_counter = 0
-        self.width = 50
-        self.height = 50
 
     # width getter
     def get_width(self):
-        pass
+        """
 
+        :return: the width of the ship image.
+        """
+        return self.ship_img.get_width()
 
+    def get_height(self):
+        """
+
+        :return: the height of the ship image.
+        """
+        return self.ship_img.get_height()
 
     def draw(self, parent):
+        """
+
+        :param parent: Parent is a pygame object, it means that it will be draw as a surface on the
+         pygame objet (screen).
+        """
         parent.blit(self.ship_img, (self.x, self.y))
 
 
 class Player(Ship):
+    """
+        Inherits the Ship class.
+    """
+
     def __init__(self, x, y, health=100):
         super(Player, self).__init__(x, y, health)
         self.ship_img = YELLOW_SPACE_SHIP
