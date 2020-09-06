@@ -9,7 +9,7 @@ D: to go right.
 __author__ = "Iaggo Capitanio"
 __copyright__ = "Copyright (C) 2020 Iaggo Capitanio"
 __license__ = "Public Domain"
-__version__ = "1.0.1"
+__version__ = "1.1.1"
 
 import pygame
 import os
@@ -50,6 +50,8 @@ def main() -> None:
 
     :return None
     """
+    # a factor related to the normal probability of the enemy shooting
+    prob = 1
     # the laser velocity
     laser_velocity = 5
     # defines if the player lost the game
@@ -178,13 +180,15 @@ def main() -> None:
         for enemy in enemies[:]:
             enemy.move(enemy_vel)
             enemy.move_lasers(velocity=laser_velocity, obj=player, height=WIN.get_height())
+
+            if random.randrange(0, prob*FPS) == 1:
+                enemy.shoot()
+
             if enemy.y + enemy.get_height() > WIN.get_height():
                 lives -= 1
                 enemies.remove(enemy)
 
         player.move_lasers(-laser_velocity, enemies, height=WIN.get_height())
-
-
 
 
 if __name__ == "__main__":

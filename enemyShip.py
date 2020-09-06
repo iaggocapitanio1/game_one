@@ -10,6 +10,7 @@ from shipAbstractGraphic import Ship
 import pygame
 import os
 import typing as ty
+from laserGraphics import Laser
 
 file_resources = "assets"
 try:
@@ -33,6 +34,7 @@ class Enemy(Ship):
     """
     This class defines the enemy ships.
     """
+    # red enemy ships have red lasers, so on ...
     COLOR_MAP = {
         "red": (RED_SPACE_SHIP, RED_LASER),
         "green": (GREEN_SPACE_SHIP, GREEN_LASER),
@@ -44,6 +46,24 @@ class Enemy(Ship):
         super(Enemy, self).__init__(x, y, health=health)
         self.ship_img, self.laser_img = self.COLOR_MAP[color]
         self.mask = pygame.mask.from_surface(self.ship_img)
+
+    def cool_down(self):
+        """
+        Take a time between shoots.
+        """
+        if self.cool_down_counter >= self.COOL_DOWN:
+            self.cool_down_counter = 0
+        elif self.cool_down_counter > 0:
+            self.cool_down_counter += 1
+
+    def shoot(self):
+        """
+        This function allows the enemies ships to shoot.
+        """
+        if self.cool_down_counter == 0:
+            laser = Laser(self.x - 20, self.y, self.laser_img)
+            self.lasers.append(laser)
+            self.cool_down_counter = 1
 
     def move_lasers(self, velocity, obj, height):
         """
@@ -87,3 +107,5 @@ class Enemy(Ship):
          pygame objet (screen).
         """
         parent.blit(self.ship_img, (self.x, self.y))
+        for laser in self.lasers:
+            laser.draw(parent)

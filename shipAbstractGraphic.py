@@ -11,6 +11,7 @@ class Ship:
     """
     This is an abstract class, it defines the main features of the object: ship.
     """
+    COOL_DOWN = 15  # constant variable
 
     def __init__(self, x, y, health=100):
         self.x = x
